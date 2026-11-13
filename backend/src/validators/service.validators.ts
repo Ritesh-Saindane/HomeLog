@@ -9,5 +9,6 @@ export const serviceRecordSchema = z.object({
   serviceProvider: z.string().trim().max(150).optional().nullable(),
   cost: z.coerce.number().nonnegative().optional().nullable(),
   invoiceUrl: z.string().url().optional().nullable(),
+  replacedComponents: z.string().max(4000).optional().nullable(),
 });
 

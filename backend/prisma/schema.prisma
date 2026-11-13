@@ -39,6 +39,7 @@ model Asset {
   warrantyEndDate   DateTime?             @map("warranty_end_date") @db.Date
   qrCodeId          String                @unique @default(uuid()) @map("qr_code_id") @db.Uuid
   location          String?
+  photoUrl          String?               @map("photo_url")
   status            AssetStatus           @default(ACTIVE)
   notes             String?
   createdAt         DateTime              @default(now()) @map("created_at")
@@ -63,6 +64,7 @@ model ServiceRecord {
   serviceProvider String? @map("service_provider")
   cost           Decimal? @db.Decimal(12, 2)
   invoiceUrl     String?  @map("invoice_url")
+  replacedComponents String? @map("replaced_components")
   createdAt      DateTime @default(now()) @map("created_at")
   asset          Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
 

@@ -18,7 +18,11 @@ Backend B1 and Frontend F1 currently provide:
 - JWT authentication with bcrypt password hashing
 - Ownership-protected asset, QR lookup, service-history, and maintenance APIs
 - QR display and camera scanning in the mobile app
+- Asset photos, room organization, search, filtering, and grouped asset lists
 - Service-history and maintenance screens
+- Replaced-component tracking for each service record
+- Read-only public QR view showing the five most recent service records
+- QR printing from an asset detail screen
 - Local maintenance reminders using `expo-notifications`
 
 The backend and mobile feature phases are now implemented. The app still needs real-device QA and production hardening before deployment.
@@ -47,6 +51,7 @@ Invoke-RestMethod http://localhost:3000/health
 - `GET|POST /assets`
 - `GET|PUT /assets/:id`
 - `GET /assets/qr/:qrCodeId`
+- `GET /public/assets/qr/:qrCodeId` (read-only, no authentication)
 - `GET|POST /assets/:assetId/services`
 - `PUT|DELETE /services/:id`
 - `GET|POST /assets/:assetId/maintenance`
@@ -67,7 +72,9 @@ For an Android emulator, use `http://10.0.2.2:3000`. For a physical device, use 
 
 The login and registration screens call `/auth/login` and `/auth/register`.
 
-The mobile app requests camera permission for QR scanning and notification permission before scheduling local maintenance reminders. Notification times use the device's local timezone; past dates are skipped.
+The mobile app requests camera and photo-library permissions for QR scanning and asset photos, plus notification permission before scheduling local maintenance reminders. Notification times use the device's local timezone; past dates are skipped.
+
+Photos are currently stored as the selected device URI. A cloud upload service such as Cloudinary can replace this later for cross-device photo access.
 
 ## PostgreSQL with Docker
 

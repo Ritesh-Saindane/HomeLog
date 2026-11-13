@@ -1,9 +1,9 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
 export function AssetCard({ asset, onPress }) {
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
-      <View style={styles.icon}><Text style={styles.iconText}>{asset.category.slice(0, 1).toUpperCase()}</Text></View>
+      {asset.photoUrl ? <Image source={{ uri: asset.photoUrl }} style={styles.photo} /> : <View style={styles.icon}><Text style={styles.iconText}>{asset.category.slice(0, 1).toUpperCase()}</Text></View>}
       <View style={styles.content}>
         <Text style={styles.name}>{asset.name}</Text>
         <Text style={styles.meta}>{asset.brand || 'Brand not added'} · {asset.location || 'Location not added'}</Text>
@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
   card: { alignItems: 'center', backgroundColor: '#fff', borderRadius: 16, flexDirection: 'row', marginBottom: 12, padding: 14 },
   pressed: { opacity: 0.75 },
   icon: { alignItems: 'center', backgroundColor: '#dbeafe', borderRadius: 14, height: 48, justifyContent: 'center', width: 48 },
+  photo: { borderRadius: 14, height: 48, width: 48 },
   iconText: { color: '#2563eb', fontSize: 20, fontWeight: '800' },
   content: { flex: 1, marginLeft: 12 },
   name: { color: '#0f172a', fontSize: 16, fontWeight: '700' },

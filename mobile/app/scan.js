@@ -14,8 +14,12 @@ export default function ScanScreen() {
     if (scanned) return;
     setScanned(true);
     try {
-      const response = await api.get(`/assets/qr/${encodeURIComponent(data)}`);
-      router.replace(`/assets/${response.data.id}`);
+      try {
+        const response = await api.get(`/assets/qr/${encodeURIComponent(data)}`);
+        router.replace(`/assets/${response.data.id}`);
+      } catch {
+        router.replace({ pathname: '/public-asset', params: { qrCodeId: data } });
+      }
     } catch (requestError) {
       setError(requestError.response?.data?.error || 'This QR code does not match one of your assets.');
       setScanned(false);

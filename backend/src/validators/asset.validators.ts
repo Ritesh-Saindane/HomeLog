@@ -12,6 +12,7 @@ export const assetSchema = z.object({
   purchasePrice: z.coerce.number().nonnegative().optional().nullable(),
   warrantyEndDate: optionalDate,
   location: z.string().trim().max(150).optional().nullable(),
+  photoUrl: z.string().max(2000).optional().nullable(),
   status: z.enum(['ACTIVE', 'IN_REPAIR', 'RETIRED', 'SOLD']).optional(),
   notes: z.string().max(2000).optional().nullable(),
 });
