@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { z } from 'zod';
 import { Request, Response } from 'express';
 import { prisma } from '../config/prisma';
 import { env } from '../config/env';
@@ -36,6 +37,13 @@ export async function currentUser(request: Request, response: Response): Promise
   const { userId } = request as AuthenticatedRequest;
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new HttpError(404, 'User not found');
+  response.json({ user: publicUser(user) });
+}
+
+export async function updateCurrentUser(request: Request, response: Response): Promise<void> {
+  const { userId } = request as AuthenticatedRequest;
+  const data = parseBody(z.object({ name: z.string().trim().min(2).max(100) }), request.body);
+  const user = await prisma.user.update({ where: { id: userId }, data: { name: data.name } });
   response.json({ user: publicUser(user) });
 }
 

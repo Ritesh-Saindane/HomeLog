@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import { api } from '../src/services/api';
+import { BottomNav } from '../src/components/BottomNav';
 
 export default function ScanScreen() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -25,8 +26,8 @@ export default function ScanScreen() {
       setScanned(false);
     }
   }
-  return <View style={styles.container}><CameraView style={StyleSheet.absoluteFillObject} barcodeScannerSettings={{ barcodeTypes: ['qr'] }} onBarcodeScanned={scanned ? undefined : handleBarcodeScanned} /><View style={styles.overlay}><Text style={styles.title}>Scan an asset QR code</Text><View style={styles.frame} />{error ? <Text style={styles.error}>{error}</Text> : null}<Button title="Cancel" onPress={() => router.back()} /></View></View>;
+  return <View style={styles.container}><View style={styles.camera}><CameraView style={StyleSheet.absoluteFillObject} barcodeScannerSettings={{ barcodeTypes: ['qr'] }} onBarcodeScanned={scanned ? undefined : handleBarcodeScanned} /><View style={styles.overlay}><Text style={styles.title}>Scan an asset QR code</Text><View style={styles.frame} />{error ? <Text style={styles.error}>{error}</Text> : null}<Button title="Cancel" onPress={() => router.back()} /></View></View><BottomNav /></View>;
 }
 
-const styles = StyleSheet.create({ container: { flex: 1 }, center: { alignItems: 'center', backgroundColor: '#eff6ff', flex: 1, justifyContent: 'center', padding: 24 }, overlay: { alignItems: 'center', backgroundColor: 'rgba(15, 23, 42, 0.5)', flex: 1, justifyContent: 'center', padding: 24 }, title: { color: '#fff', fontSize: 20, fontWeight: '700', marginBottom: 24, textAlign: 'center' }, frame: { borderColor: '#fff', borderRadius: 18, borderWidth: 3, height: 240, marginBottom: 24, width: 240 }, error: { color: '#fecaca', marginBottom: 16, textAlign: 'center' } });
+const styles = StyleSheet.create({ container: { flex: 1 }, camera: { flex: 1 }, center: { alignItems: 'center', backgroundColor: '#eff6ff', flex: 1, justifyContent: 'center', padding: 24 }, overlay: { alignItems: 'center', backgroundColor: 'rgba(15, 23, 42, 0.5)', flex: 1, justifyContent: 'center', padding: 24 }, title: { color: '#fff', fontSize: 20, fontWeight: '700', marginBottom: 24, textAlign: 'center' }, frame: { borderColor: '#fff', borderRadius: 18, borderWidth: 3, height: 240, marginBottom: 24, width: 240 }, error: { color: '#fecaca', marginBottom: 16, textAlign: 'center' } });
 

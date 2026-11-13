@@ -58,8 +58,15 @@ export function AuthProvider({ children }) {
     await Promise.all([AsyncStorage.removeItem(TOKEN_KEY), AsyncStorage.removeItem(USER_KEY)]);
   }
 
+  async function updateName(name) {
+    const response = await api.patch('/auth/me', { name });
+    const nextUser = response.data.user;
+    setUser(nextUser);
+    await AsyncStorage.setItem(USER_KEY, JSON.stringify(nextUser));
+  }
+
   const value = useMemo(
-    () => ({ token, user, isLoading, isAuthenticated: Boolean(token), login, register, logout }),
+    () => ({ token, user, isLoading, isAuthenticated: Boolean(token), login, register, logout, updateName }),
     [token, user, isLoading],
   );
 
