@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { api } from '../services/api';
 import { useAuth } from './AuthContext';
 
@@ -38,26 +38,39 @@ export function AssetProvider({ children }) {
   const { token, isAuthenticated } = useAuth();
   const [assets, setAssets] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const refreshAssets = useCallback(async () => {
+      if (!isAuthenticated) {
+        const savedAssets = await AsyncStorage.getItem(ASSETS_KEY);
+        const localAssets = savedAssets ? JSON.parse(savedAssets) : starterAssets;
+        setAssets(localAssets);
+        return localAssets;
+      }
+      try {
+        const response = await api.get('/assets');
+        setAssets(response.data);
+        return response.data;
+      } catch (error) {
+        // Preserve the last server result on transient errors; never replace an
+        // authenticated account's list with the anonymous starter examples.
+        console.warn('Could not refresh HomeLog assets', error.message);
+        return null;
+      }
+  }, [isAuthenticated, token]);
 
   useEffect(() => {
-    async function restoreAssets() {
-      try {
-        if (isAuthenticated && token) {
-          const response = await api.get('/assets');
-          setAssets(response.data);
-        } else {
-          const savedAssets = await AsyncStorage.getItem(ASSETS_KEY);
-          setAssets(savedAssets ? JSON.parse(savedAssets) : starterAssets);
-        }
-      } catch {
-        const savedAssets = await AsyncStorage.getItem(ASSETS_KEY);
-        setAssets(savedAssets ? JSON.parse(savedAssets) : starterAssets);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    restoreAssets();
-  }, [isAuthenticated, token]);
+    let mounted = true;
+    setIsLoading(true);
+    refreshAssets().finally(() => { if (mounted) setIsLoading(false); });
+    return () => { mounted = false; };
+  }, [refreshAssets]);
+
+  const refresh = useCallback(async () => {
+    if (!isAuthenticated) return;
+    setRefreshing(true);
+    try { return await refreshAssets(); } finally { setRefreshing(false); }
+  }, [isAuthenticated, refreshAssets]);
 
   async function persist(nextAssets) {
     setAssets(nextAssets);
@@ -86,8 +99,8 @@ export function AssetProvider({ children }) {
   }
 
   const value = useMemo(
-    () => ({ assets, isLoading, addAsset, updateAsset }),
-    [assets, isLoading],
+    () => ({ assets, isLoading, refreshing, refresh, addAsset, updateAsset }),
+    [assets, isLoading, refreshing, refresh],
   );
 
   return <AssetContext.Provider value={value}>{children}</AssetContext.Provider>;

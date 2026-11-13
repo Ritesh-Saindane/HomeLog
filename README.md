@@ -76,6 +76,8 @@ The mobile app requests camera and photo-library permissions for QR scanning and
 
 The home dashboard groups shortcuts by room, shows active care reminders, a local household task list, this month's service costs, and links to a service/warranty timeline. Dates in asset warranty, service, and maintenance forms open the device calendar.
 
+The dashboard also shows six months of service spending. The AI helper asks you to choose a specific appliance and sends only that appliance's history to the backend advice endpoint.
+
 ## Optional AI maintenance advice
 
 Set `GROQ_API_KEY` in `backend/.env` and restart the backend to enable the authenticated `/advice` endpoint and the mobile HomeLog Helper screen. The key stays on the backend and is never bundled into the mobile app. Without the key, the rest of HomeLog continues to work and the advice screen explains how to enable AI.

@@ -1,46 +1,51 @@
-import { router } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useAuth } from '../src/context/AuthContext';
 import { useAssets } from '../src/context/AssetContext';
 import { api } from '../src/services/api';
 import { syncUserNotifications } from '../src/services/notifications';
 import { TodoPanel } from '../src/components/TodoPanel';
+import { SpendingChart } from '../src/components/SpendingChart';
 
 const rooms = [
-  { name: 'Living room', icon: '▱', color: '#e7f2fc' },
-  { name: 'Kitchen', icon: '⌂', color: '#e7f5f0' },
-  { name: 'Bedroom', icon: '☾', color: '#f0ecfb' },
-  { name: 'Bathroom', icon: '◌', color: '#e9f5f6' },
-  { name: 'Study room', icon: '▤', color: '#fbf1e4' },
-  { name: 'Other', icon: '＋', color: '#f1f3f3' },
+  { name: 'Living room', icon: '🛋️', color: '#e7f2fc' },
+  { name: 'Kitchen', icon: '🍳', color: '#e7f5f0' },
+  { name: 'Bedroom', icon: '🛏️', color: '#f0ecfb' },
+  { name: 'Bathroom', icon: '🛁', color: '#e9f5f6' },
+  { name: 'Study room', icon: '📚', color: '#fbf1e4' },
+  { name: 'Other', icon: '📦', color: '#f1f3f3' },
 ];
 
 export default function HomeScreen() {
   const { user, logout } = useAuth();
-  const { assets, isLoading } = useAssets();
+  const { assets, isLoading, refresh } = useAssets();
   const [schedules, setSchedules] = useState([]);
   const [services, setServices] = useState([]);
-  useEffect(() => {
-    if (isLoading || !assets.length) return;
-    syncUserNotifications(assets, api).catch(() => {});
+  useFocusEffect(useCallback(() => {
     let active = true;
-    Promise.all(assets.map(async (asset) => {
+    async function loadDashboard() {
+      const currentAssets = await refresh();
+      if (isLoading || !currentAssets?.length) { if (active && currentAssets) { setSchedules([]); setServices([]); } return; }
+      syncUserNotifications(currentAssets, api).catch(() => {});
+      const results = await Promise.all(currentAssets.map(async (asset) => {
       const [scheduleResult, serviceResult] = await Promise.all([
         api.get(`/assets/${asset.id}/maintenance`).catch(() => ({ data: [] })),
         api.get(`/assets/${asset.id}/services`).catch(() => ({ data: [] })),
       ]);
       return { asset, schedules: scheduleResult.data, services: serviceResult.data };
-    })).then((results) => {
+      }));
       if (!active) return;
       setSchedules(results.flatMap(({ asset, schedules: items }) => items.map((item) => ({ ...item, assetName: asset.name }))));
       setServices(results.flatMap(({ asset, services: items }) => items.map((item) => ({ ...item, assetName: asset.name }))));
-    });
+    }
+    loadDashboard();
     return () => { active = false; };
-  }, [assets, isLoading]);
+  }, [isLoading, refresh]));
   const monthSpend = useMemo(() => {
     const now = new Date();
-    return services.filter((item) => { const date = new Date(item.serviceDate); return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth(); }).reduce((sum, item) => sum + Number(item.cost || 0), 0);
+    const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    return services.filter((item) => String(item.serviceDate).slice(0, 7) === monthKey).reduce((sum, item) => sum + Number(item.cost || 0), 0);
   }, [services]);
   const activeSchedules = schedules.filter((item) => item.isActive);
   const roomsWithAssets = rooms.map((room) => ({ ...room, count: assets.filter((asset) => (asset.location || 'Other') === room.name).length }));
@@ -51,6 +56,7 @@ export default function HomeScreen() {
     <View style={styles.sectionHead}><Text style={styles.sectionTitle}>Rooms</Text><Pressable onPress={() => router.push('/assets')}><Text style={styles.seeAll}>All assets ›</Text></Pressable></View>
     <View style={styles.roomGrid}>{roomsWithAssets.map((room) => <Pressable key={room.name} onPress={() => router.push({ pathname: '/assets', params: { room: room.name } })} style={[styles.roomCard, { backgroundColor: room.color }]}><View style={styles.roomTop}><Text style={styles.roomIcon}>{room.icon}</Text><Text style={styles.roomCount}>{room.count}</Text></View><Text style={styles.roomName}>{room.name}</Text><Text style={styles.roomCaption}>{room.count === 1 ? '1 asset' : `${room.count} assets`}</Text></Pressable>)}</View>
     <TodoPanel schedules={activeSchedules} assets={assets} />
+    <SpendingChart services={services} />
     <View style={styles.sectionHead}><Text style={styles.sectionTitle}>Coming up</Text><Pressable onPress={() => router.push('/timeline')}><Text style={styles.seeAll}>Timeline ›</Text></Pressable></View>
     {activeSchedules.slice(0, 2).map((item) => <View key={item.id} style={styles.upcoming}><View style={styles.upcomingIcon}><Text style={styles.upcomingGlyph}>◷</Text></View><View style={styles.upcomingText}><Text style={styles.upcomingTitle}>{item.title}</Text><Text style={styles.roomCaption}>{item.assetName} · {String(item.nextDueDate).slice(0, 10)}</Text></View></View>)}
     <View style={styles.actions}><Pressable style={styles.actionPrimary} onPress={() => router.push('/assets/new')}><Text style={styles.actionPrimaryText}>＋ Add an asset</Text></Pressable><Pressable style={styles.actionSecondary} onPress={() => router.push('/scan')}><Text style={styles.actionSecondaryText}>Scan QR</Text></Pressable></View>
