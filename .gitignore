@@ -15,6 +15,7 @@ coverage/
 *.tsbuildinfo
 
 generated/
+**/.claude/
 .DS_Store
 Thumbs.db
 
