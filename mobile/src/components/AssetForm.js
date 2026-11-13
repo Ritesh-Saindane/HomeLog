@@ -30,13 +30,17 @@ export function AssetForm({ initialValues = {}, submitLabel, onSubmit }) {
   }
 
   async function choosePhoto() {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      setError('Photo library permission is required to add an asset photo.');
-      return;
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        setError('Photo library permission is required to add an asset photo.');
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, quality: 0.8 });
+      if (!result.canceled) updateField('photoUrl', result.assets[0].uri);
+    } catch {
+      setError('Unable to open the photo library. Please try again.');
     }
-    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, quality: 0.8 });
-    if (!result.canceled) updateField('photoUrl', result.assets[0].uri);
   }
 
   return (
