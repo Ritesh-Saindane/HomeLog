@@ -23,6 +23,8 @@ export default function HomeScreen() {
       {isLoading ? <Text style={styles.cardText}>Loading assets…</Text> : assets.slice(0, 2).map((asset) => <AssetCard key={asset.id} asset={asset} onPress={() => router.push(`/assets/${asset.id}`)} />)}
       <Pressable onPress={() => router.push('/assets/new')} style={styles.primary}><Text style={styles.primaryText}>＋ Add asset</Text></Pressable>
       <Pressable onPress={() => router.push('/scan')} style={styles.secondary}><Text style={styles.secondaryText}>Scan asset QR</Text></Pressable>
+      <Pressable onPress={() => router.push('/add-service')} style={styles.secondary}><Text style={styles.secondaryText}>Add service record</Text></Pressable>
+      <Pressable onPress={() => router.push('/add-maintenance')} style={styles.secondary}><Text style={styles.secondaryText}>Add maintenance reminder</Text></Pressable>
       {assets[0] ? <Pressable onPress={() => router.push(`/assets/${assets[0].id}/maintenance`)} style={styles.secondary}><Text style={styles.secondaryText}>Manage maintenance</Text></Pressable> : null}
       <Pressable onPress={logout} style={styles.secondary}><Text style={styles.secondaryText}>Sign out</Text></Pressable>
       <Pressable onPress={() => router.replace('/login')} style={styles.linkButton}><Text style={styles.linkText}>Return to sign in</Text></Pressable>
