@@ -2,7 +2,7 @@
 
 HomeLog is a QR-based household asset and maintenance tracker. The project is being built incrementally for the CPAD lab, beginning with the backend foundation.
 
-## Current phase: Frontend F1
+## Current phase: Frontend F2
 
 Backend B1 and Frontend F1 currently provide:
 
@@ -14,8 +14,11 @@ Backend B1 and Frontend F1 currently provide:
 - Axios API client with configurable `EXPO_PUBLIC_API_URL`
 - AsyncStorage-backed authentication state
 - Login and registration screens ready for backend B2 integration
+- Dashboard and asset-management screens: list, add, edit, and details
 
 Backend authentication, asset APIs, service APIs, maintenance APIs, and the remaining mobile phases are intentionally not implemented yet.
+
+F2 currently uses an AsyncStorage-backed local demo asset store because the backend asset endpoints are planned for B3. The screens are structured so that the store can be replaced with API calls without changing the route UI.
 
 ## Backend commands
 
