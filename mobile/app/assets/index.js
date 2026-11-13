@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
@@ -7,8 +7,9 @@ import { useAssets } from '../../src/context/AssetContext';
 
 export default function AssetsScreen() {
   const { assets, isLoading } = useAssets();
+  const { room: initialRoom } = useLocalSearchParams();
   const [query, setQuery] = useState('');
-  const [room, setRoom] = useState('ALL');
+  const [room, setRoom] = useState(initialRoom || 'ALL');
   const [category, setCategory] = useState('ALL');
   const filtered = assets.filter((asset) => `${asset.name} ${asset.brand || ''}`.toLowerCase().includes(query.toLowerCase()) && (room === 'ALL' || asset.location === room) && (category === 'ALL' || asset.category === category));
   const grouped = filtered.reduce((groups, asset) => { const key = asset.location || 'Other'; (groups[key] ||= []).push(asset); return groups; }, {});

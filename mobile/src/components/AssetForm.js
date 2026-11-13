@@ -2,6 +2,7 @@ import { useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { DateField } from './DateField';
 
 const fields = [
   ['name', 'Asset name', 'e.g. Bedroom AC'],
@@ -9,7 +10,6 @@ const fields = [
   ['modelNumber', 'Model number', 'Optional'],
   ['serialNumber', 'Serial number', 'Optional'],
   ['location', 'Location', 'e.g. Kitchen'],
-  ['warrantyEndDate', 'Warranty end date', 'YYYY-MM-DD'],
 ];
 
 export function AssetForm({ initialValues = {}, submitLabel, onSubmit }) {
@@ -54,6 +54,7 @@ export function AssetForm({ initialValues = {}, submitLabel, onSubmit }) {
           <TextInput value={values[field] || ''} onChangeText={(value) => updateField(field, value)} placeholder={placeholder} placeholderTextColor="#94a3b8" style={styles.input} />
         </View>
       ))}
+      <DateField label="Warranty end date" value={values.warrantyEndDate} onChange={(value) => updateField('warrantyEndDate', value)} />
       <Text style={styles.label}>Room / location</Text>
       <View style={styles.picker}><Picker selectedValue={values.location || ''} onValueChange={(value) => updateField('location', value)}><Picker.Item label="Select room" value="" /><Picker.Item label="Living room" value="Living room" /><Picker.Item label="Kitchen" value="Kitchen" /><Picker.Item label="Bedroom" value="Bedroom" /><Picker.Item label="Bathroom" value="Bathroom" /><Picker.Item label="Study room" value="Study room" /><Picker.Item label="Balcony" value="Balcony" /><Picker.Item label="Other" value="Other" /></Picker></View>
       <View style={styles.photoRow}>{values.photoUrl ? <Image source={{ uri: values.photoUrl }} style={styles.photo} /> : <View style={styles.photoPlaceholder}><Text style={styles.photoPlaceholderText}>No photo</Text></View>}<Pressable onPress={choosePhoto} style={styles.photoButton}><Text style={styles.photoButtonText}>{values.photoUrl ? 'Change photo' : 'Add photo'}</Text></Pressable></View>
