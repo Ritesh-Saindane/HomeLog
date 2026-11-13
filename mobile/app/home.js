@@ -3,10 +3,16 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useAuth } from '../src/context/AuthContext';
 import { useAssets } from '../src/context/AssetContext';
 import { AssetCard } from '../src/components/AssetCard';
+import { api } from '../src/services/api';
+import { syncUserNotifications } from '../src/services/notifications';
+import { useEffect } from 'react';
 
 export default function HomeScreen() {
   const { user, logout } = useAuth();
   const { assets, isLoading } = useAssets();
+  useEffect(() => {
+    if (!isLoading && assets.length) syncUserNotifications(assets, api).catch(() => {});
+  }, [isLoading, assets]);
   return (
     <View style={styles.container}>
       <Text style={styles.kicker}>HOMELOG</Text>
