@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { api } from '../services/api';
+import { useAuth } from './AuthContext';
 
 const ASSETS_KEY = '@homelog/demo_assets';
 
@@ -33,17 +35,29 @@ const starterAssets = [
 const AssetContext = createContext(null);
 
 export function AssetProvider({ children }) {
+  const { token, isAuthenticated } = useAuth();
   const [assets, setAssets] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function restoreAssets() {
-      const savedAssets = await AsyncStorage.getItem(ASSETS_KEY);
-      setAssets(savedAssets ? JSON.parse(savedAssets) : starterAssets);
-      setIsLoading(false);
+      try {
+        if (isAuthenticated && token) {
+          const response = await api.get('/assets');
+          setAssets(response.data);
+        } else {
+          const savedAssets = await AsyncStorage.getItem(ASSETS_KEY);
+          setAssets(savedAssets ? JSON.parse(savedAssets) : starterAssets);
+        }
+      } catch {
+        const savedAssets = await AsyncStorage.getItem(ASSETS_KEY);
+        setAssets(savedAssets ? JSON.parse(savedAssets) : starterAssets);
+      } finally {
+        setIsLoading(false);
+      }
     }
     restoreAssets();
-  }, []);
+  }, [isAuthenticated, token]);
 
   async function persist(nextAssets) {
     setAssets(nextAssets);
@@ -51,12 +65,22 @@ export function AssetProvider({ children }) {
   }
 
   async function addAsset(asset) {
+    if (isAuthenticated) {
+      const response = await api.post('/assets', asset);
+      setAssets((current) => [response.data, ...current]);
+      return response.data;
+    }
     const nextAsset = { ...asset, id: `asset-${Date.now()}`, status: asset.status || 'ACTIVE' };
     await persist([nextAsset, ...assets]);
     return nextAsset;
   }
 
   async function updateAsset(id, changes) {
+    if (isAuthenticated) {
+      const response = await api.put(`/assets/${id}`, changes);
+      setAssets((current) => current.map((asset) => (asset.id === id ? response.data : asset)));
+      return;
+    }
     const nextAssets = assets.map((asset) => (asset.id === id ? { ...asset, ...changes } : asset));
     await persist(nextAssets);
   }
