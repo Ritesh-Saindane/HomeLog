@@ -63,7 +63,7 @@ $env:EXPO_PUBLIC_API_URL = "http://localhost:3000"
 npm start
 ```
 
-For a physical device, use the computer's LAN IP instead of `localhost`, for example `http://192.168.1.10:3000`.
+For an Android emulator, use `http://10.0.2.2:3000`. For a physical device, use the computer's LAN IP instead of `localhost`, for example `http://192.168.1.10:3000`. A template is available at `mobile/.env.example`.
 
 The login and registration screens call `/auth/login` and `/auth/register`.
 

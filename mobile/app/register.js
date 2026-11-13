@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { AuthInput } from '../src/components/AuthInput';
 import { useAuth } from '../src/context/AuthContext';
+import { API_BASE_URL } from '../src/services/api';
 
 export default function RegisterScreen() {
   const { register } = useAuth();
@@ -20,7 +21,7 @@ export default function RegisterScreen() {
       await register({ name: name.trim(), email: email.trim(), password });
       router.replace('/home');
     } catch (requestError) {
-      setError(requestError.response?.data?.error || 'Unable to create your account. Backend authentication is coming in B2.');
+      setError(requestError.response?.data?.error || `Unable to reach the HomeLog backend at ${API_BASE_URL}. Start PostgreSQL and the backend, then check EXPO_PUBLIC_API_URL.`);
     } finally {
       setIsSubmitting(false);
     }
