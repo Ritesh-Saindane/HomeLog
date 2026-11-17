@@ -81,6 +81,7 @@ model MaintenanceSchedule {
   nextDueDate       DateTime @map("next_due_date") @db.Date
   repeatEveryMonths Int?     @map("repeat_every_months")
   reminderDaysBefore Int     @default(7) @map("reminder_days_before")
+  reminderTime      String   @default("09:00") @map("reminder_time")
   isActive          Boolean  @default(true) @map("is_active")
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")

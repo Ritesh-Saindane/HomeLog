@@ -1,98 +1,115 @@
 # HomeLog
 
-HomeLog is a QR-based household asset and maintenance tracker. The project is being built incrementally for the CPAD lab, beginning with the backend foundation.
+HomeLog helps households organize appliances by room, record repairs, schedule maintenance, and review service costs and history. The mobile app is built with Expo React Native (JavaScript); the API uses Express, TypeScript, Prisma, and PostgreSQL.
 
-## Current phase: Backend B6 / Frontend F6
+## App workflow
 
-Backend B1 and Frontend F1 currently provide:
+| Step | Screen | Step | Screen |
+|---|---|---|---|
+| 1. Sign in or create an account | ![Sign in](docs/screenshots/Screenshot_20261117_201536.jpg) | 2. View the home dashboard and rooms | ![Home dashboard](docs/screenshots/Screenshot_20261117_205320.jpg) |
+| 3. Open the add asset form | ![Add asset](docs/screenshots/Screenshot_20261117_201803.jpg) | 4. Enter appliance information | ![Asset details form](docs/screenshots/01-add-asset-details.jpeg) |
+| 5. Add a photo, choose a room, and save | ![Save asset](docs/screenshots/02-save-asset.jpeg) | 6. Browse or filter saved assets | ![Browse assets](docs/screenshots/04-browse-all-assets.jpeg) |
+| 7. Filter assets by room and type | ![Filtered assets](docs/screenshots/03-assets-filtered.jpeg) | 8. Open an appliance | ![Appliance details](docs/screenshots/08-asset-details-and-history.jpeg) |
+| 9. Ask appliance specific AI advice | ![Appliance advice](docs/screenshots/Screenshot_20261117_202346.jpg) | 10. View and print its QR code | ![QR code](docs/screenshots/05-asset-qr-and-ai.jpeg) |
+| 11. Review service history | ![Service history](docs/screenshots/Screenshot_20261117_202321.jpg) | 12. Add or edit a service record | ![Edit service record](docs/screenshots/Screenshot_20261117_202105.jpg) |
+| 13. Manage maintenance schedules | ![Maintenance schedules](docs/screenshots/06-maintenance-reminder.jpeg) | 14. Set a reminder date and time | ![Reminder form](docs/screenshots/Screenshot_20261117_203743.jpg) |
+| 15. Receive scheduled notifications | ![Notifications](docs/screenshots/Screenshot_20261117_205310.jpg) | 16. Review analytics and timeline | ![Analytics and timeline](docs/screenshots/07-analytics-timeline.jpeg) |
+| 17. Manage home to-dos | ![Home to-dos](docs/screenshots/09-home-todos.jpeg) | 18. Update profile and dark mode | ![Settings](docs/screenshots/Screenshot_20261117_205743.jpg) |
 
-- Node.js, Express, and TypeScript backend initialization
-- PostgreSQL configuration through Docker Compose
-- Prisma schema for users, assets, service records, and maintenance schedules
-- Health-check endpoint with database connectivity verification
-- Expo React Native mobile application using JavaScript and Expo Router
-- Axios API client with configurable `EXPO_PUBLIC_API_URL`
-- AsyncStorage-backed authentication state
-- Login and registration screens ready for backend B2 integration
-- Dashboard and asset-management screens: list, add, edit, and details
-- JWT authentication with bcrypt password hashing
-- Ownership-protected asset, QR lookup, service-history, and maintenance APIs
-- QR display and camera scanning in the mobile app
-- Asset photos, room organization, search, filtering, and grouped asset lists
-- Service-history and maintenance screens
-- Replaced-component tracking for each service record
-- Read-only public QR view showing the five most recent service records
-- QR printing from an asset detail screen
-- Local maintenance reminders using `expo-notifications`
+### Dark mode
 
-The backend and mobile feature phases are now implemented. The app still needs real-device QA and production hardening before deployment.
+| Home dashboard | Asset list | Asset details and QR | Analytics timeline |
+|---|---|---|---|
+| ![Dark home](docs/screenshots/Screenshot_20261117_205808.jpg) | ![Dark assets](docs/screenshots/Screenshot_20261117_205823.jpg) | ![Dark asset and QR](docs/screenshots/Screenshot_20261117_205827.jpg) | ![Dark timeline](docs/screenshots/Screenshot_20261117_205810.jpg) |
 
-## Backend commands
+| To-dos | Settings |
+|---|---|
+| ![Dark to-dos](docs/screenshots/Screenshot_20261117_205811.jpg) | ![Dark mode settings](docs/screenshots/Screenshot_20261117_205743.jpg) |
 
-```powershell
+## Architecture
+
+![HomeLog architecture](docs/architecture.svg)
+
+The mobile app calls the authenticated REST API over HTTP. The API validates requests, applies ownership checks, and uses Prisma to read and write PostgreSQL. QR service-history lookup is read-only for visitors. Maintenance reminders are scheduled locally on the device; optional AI advice is requested through the backend, which keeps the Groq key off the app.
+
+## Features
+
+- JWT account registration and sign-in
+- Room-based asset catalog with photos, search, and filters
+- Asset QR codes, camera scanning, printing, and read-only recent service history
+- Service records including cost, provider, description, and replaced parts
+- Per-asset maintenance schedules and device-local reminders
+- Home to-dos, service spending charts, and an event timeline
+- Appliance-specific AI advice using saved service history (optional)
+- Light and dark themes
+
+## Requirements
+
+- Node.js and npm
+- Docker Desktop with Docker Compose, or a local PostgreSQL server
+- Expo Go for basic app development; a development build is recommended for testing native notifications
+
+## Run locally
+
+Start PostgreSQL from the repository root:
+
+```bash
+docker compose up -d db
+```
+
+Configure and start the backend:
+
+```bash
 cd backend
 npm install
-Copy-Item .env.example .env
-npx prisma migrate dev --name init
+```
+
+Copy `backend/.env.example` to `backend/.env`, then set `DATABASE_URL` and `JWT_SECRET`. Run migrations and start the API:
+
+```bash
+npx prisma generate
+npx prisma migrate dev
 npm run dev
 ```
 
-The API runs on `http://localhost:3000` by default. Test it with:
+The API listens on port `3000`. Check it at `http://localhost:3000/health`.
 
-```powershell
-Invoke-RestMethod http://localhost:3000/health
-```
+In another terminal, configure and start the mobile app:
 
-## API surface
-
-- `POST /auth/register`
-- `POST /auth/login`
-- `GET /auth/me`
-- `GET|POST /assets`
-- `GET|PUT /assets/:id`
-- `GET /assets/qr/:qrCodeId`
-- `GET /public/assets/qr/:qrCodeId` (read-only, no authentication)
-- `GET|POST /assets/:assetId/services`
-- `PUT|DELETE /services/:id`
-- `GET|POST /assets/:assetId/maintenance`
-- `PUT /maintenance/:id`
-
-Protected endpoints require `Authorization: Bearer <token>`.
-
-## Mobile commands
-
-```powershell
+```bash
 cd mobile
 npm install
-$env:EXPO_PUBLIC_API_URL = "http://localhost:3000"
-npm start
 ```
 
-For an Android emulator, use `http://10.0.2.2:3000`. For a physical device, use the computer's LAN IP instead of `localhost`, for example `http://192.168.1.10:3000`. A template is available at `mobile/.env.example`.
+Set `EXPO_PUBLIC_API_URL` in `mobile/.env` (copy from `.env.example`) to the backend address reachable from the device, then run:
 
-The login and registration screens call `/auth/login` and `/auth/register`.
-
-The mobile app requests camera and photo-library permissions for QR scanning and asset photos, plus notification permission before scheduling local maintenance reminders. Notification times use the device's local timezone; past dates are skipped.
-
-The home dashboard groups shortcuts by room, shows active care reminders, a local household task list, this month's service costs, and links to a service/warranty timeline. Dates in asset warranty, service, and maintenance forms open the device calendar.
-
-The dashboard also shows six months of service spending. The AI helper asks you to choose a specific appliance and sends only that appliance's history to the backend advice endpoint.
-
-## Optional AI maintenance advice
-
-Set `GROQ_API_KEY` in `backend/.env` and restart the backend to enable the authenticated `/advice` endpoint and the mobile HomeLog Helper screen. The key stays on the backend and is never bundled into the mobile app. Without the key, the rest of HomeLog continues to work and the advice screen explains how to enable AI.
-
-Photos are currently stored as the selected device URI. A cloud upload service such as Cloudinary can replace this later for cross-device photo access.
-
-## PostgreSQL with Docker
-
-From the project root:
-
-```powershell
-docker compose up -d db
-docker compose ps
-docker compose logs db
+```bash
+npx expo start
 ```
 
-The local database is exposed at `localhost:5432`. The credentials are development-only values defined in `docker-compose.yml`; do not use them in production.
+Use `http://10.0.2.2:3000` for the Android emulator. For a physical phone, use the computer's LAN IP address; `localhost` on the phone refers to the phone itself.
 
+## Optional AI advice
+
+Set `GROQ_API_KEY` in `backend/.env` and restart the backend. The key remains on the server. Without it, the rest of the application remains usable.
+
+## API overview
+
+| Area | Endpoints |
+|---|---|
+| Health | `GET /health` |
+| Authentication | `POST /auth/register`, `POST /auth/login`, `GET /auth/me` |
+| Assets | `GET/POST /assets`, `GET/PUT /assets/:id`, `GET /assets/qr/:qrCodeId` |
+| Public QR history | `GET /public/assets/qr/:qrCodeId` (read-only) |
+| Services | `GET/POST /assets/:assetId/services`, `PUT/DELETE /services/:id` |
+| Maintenance | `GET/POST /assets/:assetId/maintenance`, `PUT /maintenance/:id` |
+| AI advice | `POST /advice` (authenticated; requires Groq key) |
+
+Protected routes require `Authorization: Bearer <token>`.
+
+## Notes
+
+- Never commit `.env` files or production secrets. Use `.env.example` as a template.
+- PostgreSQL development credentials in Docker Compose are for local use only.
+- Asset image references currently use the device's selected URI; shared cloud photo storage is not configured.
+- Expo Go may show a notifications support warning. Local notification behavior depends on the Expo runtime and device permissions.

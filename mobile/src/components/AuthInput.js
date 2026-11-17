@@ -1,14 +1,17 @@
 import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { useTheme } from '../context/ThemeContext';
 
 export function AuthInput({ label, ...props }) {
+  const { colors } = useTheme();
   return (
     <View style={styles.field}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
       <TextInput
         {...props}
-        autoCapitalize="none"
-        placeholderTextColor="#94a3b8"
-        style={styles.input}
+        autoCapitalize={props.autoCapitalize || 'none'}
+        placeholderTextColor={colors.muted}
+        selectionColor={colors.accent}
+        style={[styles.input, { backgroundColor: colors.input, borderColor: colors.border, color: colors.text }, props.style]}
       />
     </View>
   );
@@ -16,13 +19,10 @@ export function AuthInput({ label, ...props }) {
 
 const styles = StyleSheet.create({
   field: { marginBottom: 16 },
-  label: { color: '#334155', fontSize: 14, fontWeight: '600', marginBottom: 7 },
+  label: { fontSize: 14, fontWeight: '700', marginBottom: 8 },
   input: {
-    backgroundColor: '#f8fafc',
-    borderColor: '#cbd5e1',
     borderRadius: 12,
     borderWidth: 1,
-    color: '#0f172a',
     fontSize: 16,
     paddingHorizontal: 14,
     paddingVertical: 13,

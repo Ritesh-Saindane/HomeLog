@@ -11,13 +11,18 @@ export async function requestNotificationPermission() {
   return requested.status === 'granted';
 }
 
+function dateAtReminderTime(dateValue, reminderTime = '09:00') {
+  const time = /^([01]\d|2[0-3]):[0-5]\d$/.test(reminderTime) ? reminderTime : '09:00';
+  return new Date(`${String(dateValue).slice(0, 10)}T${time}:00`);
+}
+
 export async function rescheduleMaintenanceNotifications(schedules) {
   const allowed = await requestNotificationPermission();
   if (!allowed) return { scheduled: 0, permissionDenied: true };
   await Notifications.cancelAllScheduledNotificationsAsync();
   let scheduled = 0;
   for (const schedule of schedules.filter((item) => item.isActive)) {
-    const due = new Date(`${schedule.nextDueDate}T09:00:00`);
+    const due = dateAtReminderTime(schedule.nextDueDate, schedule.reminderTime);
     const reminder = new Date(due);
     reminder.setDate(reminder.getDate() - (schedule.reminderDaysBefore || 0));
     for (const [date, suffix] of [[reminder, 'reminder'], [due, 'due']]) {
@@ -46,17 +51,17 @@ export async function syncUserNotifications(assets, api) {
   await Notifications.cancelAllScheduledNotificationsAsync();
   let scheduled = 0;
   for (const schedule of schedules.filter((item) => item.isActive)) {
-    scheduled += await scheduleDateNotification(schedule.title, schedule.nextDueDate, schedule.reminderDaysBefore);
+    scheduled += await scheduleDateNotification(schedule.title, schedule.nextDueDate, schedule.reminderDaysBefore, schedule.title, schedule.reminderTime);
   }
   for (const asset of assets.filter((item) => item.warrantyEndDate)) {
-    scheduled += await scheduleDateNotification(`${asset.name} warranty`, asset.warrantyEndDate, 7, 'Warranty expiry reminder');
+    scheduled += await scheduleDateNotification(`${asset.name} warranty`, asset.warrantyEndDate, 7, 'Warranty expiry reminder', '09:00');
   }
   return { scheduled, permissionDenied: false };
 }
 
-async function scheduleDateNotification(title, dueDate, daysBefore, dueTitle = title) {
+async function scheduleDateNotification(title, dueDate, daysBefore, dueTitle = title, reminderTime = '09:00') {
   let scheduled = 0;
-  const due = new Date(`${String(dueDate).slice(0, 10)}T09:00:00`);
+  const due = dateAtReminderTime(dueDate, reminderTime);
   const reminder = new Date(due);
   reminder.setDate(reminder.getDate() - (daysBefore || 0));
   for (const [date, notificationTitle] of [[reminder, `${title} is coming up`], [due, `${dueTitle} is due today`]]) {
@@ -65,5 +70,13 @@ async function scheduleDateNotification(title, dueDate, daysBefore, dueTitle = t
     scheduled += 1;
   }
   return scheduled;
+}
+
+export async function scheduleTestNotification() {
+  const allowed = await requestNotificationPermission();
+  if (!allowed) return { scheduled: false, permissionDenied: true };
+  const date = new Date(Date.now() + 10000);
+  await Notifications.scheduleNotificationAsync({ content: { title: 'HomeLog test reminder', body: 'Your HomeLog notifications are working. This is a test reminder.' }, trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date } });
+  return { scheduled: true, permissionDenied: false };
 }
 

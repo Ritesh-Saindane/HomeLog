@@ -1,12 +1,14 @@
 import { Link, router } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AuthInput } from '../src/components/AuthInput';
 import { useAuth } from '../src/context/AuthContext';
 import { API_BASE_URL } from '../src/services/api';
+import { useTheme } from '../src/context/ThemeContext';
 
 export default function LoginScreen() {
   const { login } = useAuth();
+  const { colors, darkMode } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -27,32 +29,39 @@ export default function LoginScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.brand}><Text style={styles.logo}>⌂</Text><Text style={styles.title}>Welcome to HomeLog</Text><Text style={styles.subtitle}>Keep every home asset in good shape.</Text></View>
-      <View style={styles.card}>
-        <Text style={styles.heading}>Sign in</Text>
+    <KeyboardAvoidingView style={[styles.container, { backgroundColor: colors.background }]} behavior="padding">
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
+      <View style={styles.brand}><Image source={darkMode ? require('../assets/homelog-dark.png') : require('../assets/homelog-light.png')} resizeMode="contain" style={styles.logoImage} /><Text style={[styles.title, { color: colors.text }]}>Welcome home</Text><Text style={[styles.subtitle, { color: colors.muted }]}>Keep your assets, repairs, and reminders in one calm place.</Text></View>
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
+        <Text style={[styles.heading, { color: colors.text }]}>Sign in</Text>
+        <Text style={[styles.cardHint, { color: colors.muted }]}>Pick up where you left off.</Text>
         <AuthInput label="Email" keyboardType="email-address" value={email} onChangeText={setEmail} placeholder="you@example.com" />
         <AuthInput label="Password" secureTextEntry value={password} onChangeText={setPassword} placeholder="Your password" />
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-        <Pressable disabled={isSubmitting} onPress={handleLogin} style={styles.primary}><Text style={styles.primaryText}>{isSubmitting ? 'Signing in…' : 'Sign in'}</Text>{isSubmitting ? <ActivityIndicator color="#fff" /> : null}</Pressable>
-        <Text style={styles.footer}>New to HomeLog? <Link href="/register" style={styles.link}>Create an account</Link></Text>
+        {error ? <View style={[styles.errorBox, { backgroundColor: colors.input }]}><Text style={styles.error}>{error}</Text></View> : null}
+        <Pressable disabled={isSubmitting} onPress={handleLogin} style={[styles.primary, { backgroundColor: colors.accent }, isSubmitting && styles.disabled]}><Text style={styles.primaryText}>{isSubmitting ? 'Signing in…' : 'Sign in'}</Text>{isSubmitting ? <ActivityIndicator color="#fff" /> : null}</Pressable>
+        <Text style={[styles.footer, { color: colors.muted }]}>New to HomeLog? <Link href="/register" style={[styles.link, { color: colors.accent }]}>Create an account</Link></Text>
       </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { backgroundColor: '#eff6ff', flex: 1, padding: 24 },
-  brand: { marginBottom: 30, marginTop: 60 },
-  logo: { color: '#2563eb', fontSize: 42, fontWeight: '800' },
-  title: { color: '#0f172a', fontSize: 29, fontWeight: '800', marginTop: 8 },
-  subtitle: { color: '#64748b', fontSize: 16, marginTop: 8 },
-  card: { backgroundColor: '#fff', borderRadius: 20, padding: 20 },
-  heading: { color: '#0f172a', fontSize: 22, fontWeight: '700', marginBottom: 20 },
-  error: { color: '#b91c1c', fontSize: 13, marginBottom: 14 },
-  primary: { alignItems: 'center', backgroundColor: '#2563eb', borderRadius: 12, flexDirection: 'row', gap: 10, justifyContent: 'center', padding: 14 },
+  container: { flex: 1 },
+  content: { flexGrow: 1, justifyContent: 'center', padding: 24, paddingBottom: 40 },
+  brand: { marginBottom: 26 },
+  logoImage: { height: 92, marginBottom: 12, width: '100%' },
+  title: { fontSize: 30, fontWeight: '800', marginTop: 8 },
+  subtitle: { fontSize: 15, lineHeight: 22, marginTop: 8 },
+  card: { borderRadius: 20, padding: 20 },
+  heading: { fontSize: 22, fontWeight: '800' },
+  cardHint: { fontSize: 13, marginBottom: 20, marginTop: 5 },
+  errorBox: { borderRadius: 10, marginBottom: 14, padding: 11 },
+  error: { color: '#e06b60', fontSize: 13, lineHeight: 19 },
+  primary: { alignItems: 'center', borderRadius: 12, flexDirection: 'row', gap: 10, justifyContent: 'center', minHeight: 50, padding: 14 },
+  disabled: { opacity: 0.65 },
   primaryText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  footer: { color: '#64748b', marginTop: 20, textAlign: 'center' },
-  link: { color: '#2563eb', fontWeight: '700' },
+  footer: { marginTop: 20, textAlign: 'center' },
+  link: { fontWeight: '800' },
 });
 

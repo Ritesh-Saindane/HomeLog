@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="470" viewBox="0 0 1280 470" role="img" aria-labelledby="title desc">
+ <title id="title">HomeLog layered application architecture</title>
+ <desc id="desc">Client, application, API and data layers connected to PostgreSQL and an optional Groq AI service.</desc>
+ <defs>
+  <linearGradient id="client" x2="0" y2="1"><stop stop-color="#c5e5ff"/><stop offset="1" stop-color="#f4faff"/></linearGradient>
+  <linearGradient id="app" x2="0" y2="1"><stop stop-color="#e1d4ff"/><stop offset="1" stop-color="#faf7ff"/></linearGradient>
+  <linearGradient id="api" x2="0" y2="1"><stop stop-color="#c9f1d2"/><stop offset="1" stop-color="#f7fff8"/></linearGradient>
+  <linearGradient id="data" x2="0" y2="1"><stop stop-color="#ffe9b2"/><stop offset="1" stop-color="#fffaf0"/></linearGradient>
+  <linearGradient id="ai" x2="0" y2="1"><stop stop-color="#f6d9ef"/><stop offset="1" stop-color="#fff7fc"/></linearGradient>
+  <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#18345c"/></marker>
+  <style>text{font-family:Inter,Segoe UI,Arial,sans-serif;fill:#101828}.head{font-weight:800;font-size:20px}.sub{font-size:14px}.item{font-weight:700;font-size:15px}.caption{font-size:13px;font-weight:600}.stroke{stroke-width:2}</style>
+ </defs>
+ <rect width="1280" height="470" rx="20" fill="#fff"/>
+ <!-- layer panels -->
+ <g stroke-width="2">
+  <rect x="10" y="48" width="208" height="266" rx="15" fill="url(#client)" stroke="#1675d1"/>
+  <rect x="296" y="48" width="276" height="266" rx="15" fill="url(#app)" stroke="#6738bb"/>
+  <rect x="652" y="48" width="250" height="266" rx="15" fill="url(#api)" stroke="#188342"/>
+  <rect x="952" y="48" width="318" height="266" rx="15" fill="url(#data)" stroke="#d58a13"/>
+  <rect x="438" y="358" width="404" height="78" rx="16" fill="url(#ai)" stroke="#a54888"/>
+ </g>
+ <!-- panel titles -->
+ <text x="114" y="82" text-anchor="middle" class="head">Client Layer</text><text x="114" y="104" text-anchor="middle" class="sub">(Mobile – Expo)</text>
+ <text x="434" y="82" text-anchor="middle" class="head">Application Layer</text><text x="434" y="104" text-anchor="middle" class="sub">(Expo / React Native)</text>
+ <text x="777" y="82" text-anchor="middle" class="head">API Layer</text><text x="777" y="104" text-anchor="middle" class="sub">(Node.js + Express)</text>
+ <text x="1111" y="82" text-anchor="middle" class="head">Data Layer</text><text x="1111" y="104" text-anchor="middle" class="sub">(Database)</text>
+ <!-- client -->
+ <g transform="translate(79 144)" fill="none" stroke="#149ed1" stroke-width="4"><circle cx="30" cy="30" r="9"/><path d="M30 8c-14 0-22 40-10 48s36-28 28-41c-8-13-40 10-37 25s43 14 48 1C64 26 44 8 30 8z"/></g>
+ <text x="114" y="245" text-anchor="middle" class="item">React Native</text><text x="114" y="266" text-anchor="middle" class="sub">(Expo)</text>
+ <!-- app cards -->
+ <g fill="#fff" stroke="#c9bee5" stroke-width="1.5"><rect x="312" y="123" width="244" height="50" rx="11"/><rect x="312" y="183" width="244" height="50" rx="11"/><rect x="312" y="243" width="244" height="50" rx="11"/></g>
+ <text x="434" y="145" text-anchor="middle" class="item">Business Logic (App)</text><text x="434" y="162" text-anchor="middle" class="caption">Screens · state · interactions</text>
+ <text x="434" y="205" text-anchor="middle" class="item">Expo Router</text><text x="434" y="222" text-anchor="middle" class="caption">Screens &amp; Navigation</text>
+ <text x="434" y="265" text-anchor="middle" class="item">API Client</text><text x="434" y="282" text-anchor="middle" class="caption">Authentication State</text>
+ <!-- api cards -->
+ <g fill="#fff" stroke="#b6d8be" stroke-width="1.5"><rect x="668" y="123" width="218" height="50" rx="11"/><rect x="668" y="183" width="218" height="50" rx="11"/><rect x="668" y="243" width="218" height="50" rx="11"/></g>
+ <text x="777" y="145" text-anchor="middle" class="item">Authentication &amp; Validation</text><text x="777" y="162" text-anchor="middle" class="caption">JWT · request schemas</text>
+ <text x="777" y="205" text-anchor="middle" class="item">Business Logic</text><text x="777" y="222" text-anchor="middle" class="caption">Assets · service · maintenance</text>
+ <text x="777" y="265" text-anchor="middle" class="item">QR History Management</text><text x="777" y="282" text-anchor="middle" class="caption">Public read-only recent history</text>
+ <!-- data layer -->
+ <ellipse cx="1008" cy="192" rx="35" ry="12" fill="#fff" stroke="#16345b" stroke-width="3"/><path d="M973 192v50c0 17 70 17 70 0v-50M973 217c0 16 70 16 70 0" fill="#fff" stroke="#16345b" stroke-width="3"/>
+ <text x="1008" y="271" text-anchor="middle" class="item">PostgreSQL</text>
+ <g fill="#fff" stroke="#b8c0cc" stroke-width="1.5"><rect x="1072" y="119" width="180" height="39" rx="9"/><rect x="1072" y="164" width="180" height="39" rx="9"/><rect x="1072" y="209" width="180" height="39" rx="9"/><rect x="1072" y="254" width="180" height="39" rx="9"/></g>
+ <text x="1162" y="144" text-anchor="middle" class="caption">Maintenance Schedules</text><text x="1162" y="189" text-anchor="middle" class="caption">Users</text><text x="1162" y="234" text-anchor="middle" class="caption">Assets / Services</text><text x="1162" y="279" text-anchor="middle" class="caption">QR History</text>
+ <!-- connections -->
+ <path d="M218 207h68" fill="none" stroke="#18345c" stroke-width="2.5" marker-end="url(#arrow)"/><rect x="222" y="174" width="62" height="23" rx="10" fill="#fff" stroke="#9cabc3"/><text x="253" y="190" text-anchor="middle" font-size="11">HTTPS / JSON</text>
+ <path d="M572 207h70" fill="none" stroke="#18345c" stroke-width="2.5" marker-end="url(#arrow)"/><rect x="578" y="174" width="59" height="23" rx="10" fill="#fff" stroke="#9cabc3"/><text x="607" y="190" text-anchor="middle" font-size="11">REST API</text>
+ <path d="M902 207h42" fill="none" stroke="#18345c" stroke-width="2.5" marker-end="url(#arrow)"/>
+ <path d="M434 314v26q0 12 12 12h-1" fill="none" stroke="#6336a9" stroke-width="2" marker-end="url(#arrow)"/><path d="M777 314v26q0 12-12 12h-1" fill="none" stroke="#188342" stroke-width="2" marker-end="url(#arrow)"/>
+ <text x="640" y="389" text-anchor="middle" class="head">Groq AI Service</text><text x="640" y="414" text-anchor="middle" class="sub">Appliance-specific advice · API key stays on backend</text>
+</svg>
