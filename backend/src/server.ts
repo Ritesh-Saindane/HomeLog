@@ -2,8 +2,8 @@ import { app } from './app';
 import { env } from './config/env';
 import { prisma } from './config/prisma';
 
-const server = app.listen(env.port, () => {
-  console.log(`HomeLog backend listening on http://localhost:${env.port}`);
+const server = app.listen(env.port, '0.0.0.0', () => {
+  console.log(`HomeLog backend listening on http://0.0.0.0:${env.port}`);
 });
 
 async function shutdown(signal: string): Promise<void> {
